@@ -1,5 +1,5 @@
 class Api::V1::TasksController < ApplicationController
-  before_action :set_task, only: %i[ show update destroy ]
+  before_action :set_task, only: %i[ show update destroy archive_task ]
 
   # GET /tasks
   def index
@@ -40,8 +40,25 @@ class Api::V1::TasksController < ApplicationController
 
   # DELETE /completed
   def destroy_completed
-    completed_tasks = Task.where(is_completed: 'true')
+    completed_tasks = Task.where(is_completed: true)
     Task.destroy(completed_tasks.ids)
+  end
+
+  # DELETE /archived
+  def destroy_archived
+    archived_tasks = Task.where(is_deleted: true)
+    Task.destroy(archived_tasks.ids)
+  end
+
+  # PATCH /archived/1
+  def archive_task
+    @task.update(is_deleted: true)
+  end
+
+  # PATCH /archived
+  def retrieve_archived
+    archived_tasks = Task.where(is_deleted: true)
+    archived_tasks.update_all(is_deleted: false)
   end
 
   private
@@ -52,6 +69,6 @@ class Api::V1::TasksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def task_params
-      params.require(:task).permit(:description, :priority, :due_date, :is_completed)
+      params.require(:task).permit(:description, :priority, :due_date, :is_completed, :is_deleted)
     end
 end
