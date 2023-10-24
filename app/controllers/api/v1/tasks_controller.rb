@@ -38,6 +38,12 @@ class Api::V1::TasksController < ApplicationController
     @task.destroy!
   end
 
+  # DELETE /completed
+  def destroy_completed
+    completed_tasks = Task.where(is_completed: 'true')
+    Task.destroy(completed_tasks.ids)
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_task
