@@ -1,9 +1,12 @@
 class Api::V1::TasksController < ApplicationController
+  include Panko
 
   def index
     @tasks = Task.all
 
-    render json: @tasks
+    serialized_tasks = ArraySerializer.new(@tasks, each_serializer: TaskSerializer).to_json
+
+    render json: serialized_tasks
   end
 
   def show
