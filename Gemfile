@@ -50,3 +50,4 @@ end
 
 gem "interactor"
 
+gem "panko_serializer"

@@ -1,13 +1,12 @@
 class Api::V1::TasksController < ApplicationController
+  include Panko
 
   def index
     @tasks = Task.all
 
-    render json: @tasks
-  end
+    serialized_tasks = ArraySerializer.new(@tasks, each_serializer: TaskSerializer).to_json
 
-  def show
-    render json: @task
+    render json: serialized_tasks
   end
 
   def create
@@ -21,7 +20,7 @@ class Api::V1::TasksController < ApplicationController
   end
 
   def update
-    result = UpdateTaskOrganizer.call(id: params[:id], task_params: task_params) 
+    result = UpdateTaskFlow.call(id: params[:id], task_params: task_params) 
 
     if result.success?
       render json: result.task_data
@@ -35,7 +34,7 @@ class Api::V1::TasksController < ApplicationController
   end
 
   def archive_task
-    ArchiveTaskOrganizer.call(id: params[:id])
+    ArchiveTaskFlow.call(id: params[:id])
   end
 
   def retrieve_archived
