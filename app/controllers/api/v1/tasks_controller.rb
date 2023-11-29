@@ -2,43 +2,70 @@ class Api::V1::TasksController < ApplicationController
   include Panko
 
   def index
-    @tasks = Task.all
+    result = Tasks::Index.call
 
-    serialized_tasks = ArraySerializer.new(@tasks, each_serializer: TaskSerializer).to_json
-
-    render json: serialized_tasks
+    if result.success?
+      serialized_tasks = ArraySerializer.new(result.tasks, each_serializer: TaskSerializer).to_json
+      render json: serialized_tasks
+    else
+      render json: result.errors, status: :unprocessable_entity
+    end
   end
 
   def create
-    result = Tasks::CreateTaskInteractor.call(task_params: task_params)
+    result = Tasks::CreateTask.call(task_params: task_params)
 
     if result.success?
-      render json: result.task_data, status: :created
+      serialized_task = TaskSerializer.new.serialize_to_json(result.task_data)
+      render json: serialized_task, status: :created
     else
       render json: result.errors, status: :unprocessable_entity
     end
   end
 
   def update
-    result = UpdateTaskFlow.call(id: params[:id], task_params: task_params) 
+    result = Tasks::UpdateTaskFlow.call(id: params[:id], task_params: task_params) 
 
     if result.success?
-      render json: result.task_data
+      serialized_task = TaskSerializer.new.serialize_to_json(result.task_data)
+      render json: serialized_task
     else
       render json: result.errors, status: :unprocessable_entity
     end
   end
 
   def destroy_all
-    Tasks::DestroyAllTasksInteractor.call(type: params[:type])
+    if params[:type] == "completed"
+      result = Tasks::DestroyAllTasksFlow.call(task_params: { is_completed: true }, type: params[:type])
+    else
+      result = Tasks::DestroyAllTasksFlow.call(task_params: { is_deleted: true }, type: params[:type])
+    end
+
+    if result.success? 
+      render json: { success: true }
+    elsif result.fail?
+      render json: result.errors, status: :unprocessable_entity
+    end
   end
 
   def archive_task
-    ArchiveTaskFlow.call(id: params[:id])
+    result = Tasks::ArchiveTaskFlow.call(id: params[:id])
+
+    if result.success? 
+      render json: { success: true }
+    elsif result.fail?
+      render json: result.errors, status: :unprocessable_entity
+    end
   end
 
   def retrieve_archived
-    Tasks::RetrieveArchivedTasksInteractor.call
+    result = Tasks::RetrieveArchivedTasksFlow.call(task_params: { is_deleted: true })
+
+    if result.success? 
+      render json: { success: true }
+    elsif result.fail?
+      render json: result.errors, status: :unprocessable_entity
+    end
   end
 
   private
