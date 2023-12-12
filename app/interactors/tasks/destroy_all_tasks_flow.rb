@@ -1,6 +1,7 @@
 class Tasks::DestroyAllTasksFlow 
     include Interactor::Organizer
 
-    organize Tasks::FindTasks,
+    organize Tasks::SetTaskType,
+             Tasks::FindTasks,
              Tasks::DestroyAllTasks
 end
