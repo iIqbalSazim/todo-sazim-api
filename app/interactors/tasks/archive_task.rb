@@ -3,6 +3,10 @@ class Tasks::ArchiveTask
 
     def call
         task = context.task
-        context.fail!(errors: "Something went wrong. Delete failed.") unless task.update(is_deleted: true)
+        if task
+            task.update(is_deleted: true)
+        else
+            context.fail!(errors: "Something went wrong. Delete failed.")
+        end
     end
 end

@@ -49,7 +49,7 @@ class Api::V1::TasksController < ApplicationController
   end
 
   def archive_task
-    result = Tasks::ArchiveTaskFlow.call
+    result = Tasks::ArchiveTaskFlow.call(id: params[:id])
 
     if result.success? 
       render json: { success: true }
