@@ -35,7 +35,11 @@ class Api::V1::TasksController < ApplicationController
   end
 
   def destroy_all
-    result = Tasks::DestroyAllTasksFlow.call
+    if params[:type] == "completed"
+      result = Tasks::DestroyAllTasksFlow.call(task_params: { is_completed: true }, type: params[:type])
+    else
+      result = Tasks::DestroyAllTasksFlow.call(task_params: { is_deleted: true }, type: params[:type])
+    end
 
     if result.success? 
       render json: { success: true }
