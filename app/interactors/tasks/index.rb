@@ -7,7 +7,7 @@ class Tasks::Index
         if tasks
             context.tasks = tasks
         else
-            context.fail!(errors: task.errors)
+            context.fail!(errors: "Failed to fetch tasks")
         end
     end
 end
