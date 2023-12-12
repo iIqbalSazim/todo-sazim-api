@@ -8,7 +8,7 @@ class Api::V1::TasksController < ApplicationController
       serialized_tasks = ArraySerializer.new(result.tasks, each_serializer: TaskSerializer).to_json
       render json: serialized_tasks
     else
-      render json: result.errors, status: :unprocessable_entity
+      render status: :not_found
     end
   end
 
@@ -19,7 +19,7 @@ class Api::V1::TasksController < ApplicationController
       serialized_task = TaskSerializer.new.serialize_to_json(result.task_data)
       render json: serialized_task, status: :created
     else
-      render json: result.errors, status: :unprocessable_entity
+      render status: :unprocessable_entity
     end
   end
 
@@ -30,7 +30,7 @@ class Api::V1::TasksController < ApplicationController
       serialized_task = TaskSerializer.new.serialize_to_json(result.task_data)
       render json: serialized_task
     else
-      render json: result.errors, status: :unprocessable_entity
+      render status: :unprocessable_entity
     end
   end
 
@@ -43,18 +43,18 @@ class Api::V1::TasksController < ApplicationController
 
     if result.success? 
       render json: { success: true }
-    elsif result.fail?
-      render json: result.errors, status: :unprocessable_entity
+    else
+      render status: :unprocessable_entity
     end
   end
 
   def archive_task
-    result = Tasks::ArchiveTaskFlow.call(id: params[:id])
+    result = Tasks::ArchiveTaskFlow.call
 
     if result.success? 
       render json: { success: true }
-    elsif result.fail?
-      render json: result.errors, status: :unprocessable_entity
+    else
+      render status: :unprocessable_entity
     end
   end
 
@@ -63,8 +63,8 @@ class Api::V1::TasksController < ApplicationController
 
     if result.success? 
       render json: { success: true }
-    elsif result.fail?
-      render json: result.errors, status: :unprocessable_entity
+    else
+      render status: :unprocessable_entity
     end
   end
 

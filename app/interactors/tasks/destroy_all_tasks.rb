@@ -1,13 +1,14 @@
 class Tasks::DestroyAllTasks
     include Interactor
 
-    def call
-        if context.type == "completed"
-            completed_tasks = context.tasks
-            context.fail!(errors: "Something went wrong. Completed tasks delete failed.") unless Task.destroy(completed_tasks.ids)
-        elsif context.type == "archived"
-            archived_tasks = context.tasks
-            context.fail!(errors: "Something went wrong. Archived tasks delete failed.") unless Task.destroy(archived_tasks.ids)
-        end
+  def call
+    tasks_to_be_deleted = context.tasks
+    destroyed_tasks = Task.destroy(tasks_to_be_deleted.ids)
+
+    if destroyed_tasks
+      context.tasks = destroyed_tasks
+    else
+      context.fail!(errors: "Tasks delete failed")
     end
+  end
 end
