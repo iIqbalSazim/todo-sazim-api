@@ -3,6 +3,10 @@ class Tasks::RetrieveArchivedTasks
 
     def call
         archived_tasks = context.tasks
-        context.fail!(errors: "Something went wrong. Retrieve all tasks failed.") unless archived_tasks.update_all(is_deleted: false)
+        if archived_tasks
+            archived_tasks.update_all(is_deleted: false)
+        else
+            context.fail!(errors: "Something went wrong. Retrieve all tasks failed.")
+        end
     end
 end
