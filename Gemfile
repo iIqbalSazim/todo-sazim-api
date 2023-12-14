@@ -59,3 +59,5 @@ gem "mocha"
 gem "byebug"
 
 gem "json"
+
+gem 'shoulda'
