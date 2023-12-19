@@ -106,24 +106,24 @@ class Api::V1::TasksControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity 
   end
 
-  test "#destroy_all responds with success for type equals to completed" do
+  test "#destroy_all responds with success when params is_completed" do
     interactor_result = mock
     interactor_result.expects(:success?).returns(true) 
 
     Tasks::DestroyAllTasksFlow.expects(:call).returns(interactor_result)
 
-    delete :destroy_all, params: { type: "completed" }
+    post :destroy_all, params: { task: { is_completed: true } }
 
     assert_response :ok
   end
 
-  test "#destroy_all responds with success for type equals to archived" do
+  test "#destroy_all responds with success when params is_deleted" do
     interactor_result = mock
     interactor_result.expects(:success?).returns(true) 
 
     Tasks::DestroyAllTasksFlow.expects(:call).returns(interactor_result)
 
-    delete :destroy_all, params: { type: "archived" }
+    post :destroy_all, params: { task: { is_deleted: true } }
 
     assert_response :ok
   end
@@ -134,7 +134,7 @@ class Api::V1::TasksControllerTest < ActionController::TestCase
 
     Tasks::DestroyAllTasksFlow.expects(:call).returns(interactor_result)
 
-    delete :destroy_all
+    post :destroy_all, params: { task: { is_completed: true } }
 
     assert_response :unprocessable_entity 
   end
